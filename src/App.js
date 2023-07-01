@@ -1,23 +1,19 @@
-import logo from './logo.svg';
+import { useState } from 'react';
 import './App.css';
+import Canvas from './Canvas';
+import * as Icons from '@mui/icons-material';
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <Canvas />
+
+      <p>
+        <a href="https://www.freepik.com/free-psd/living-room-wall-psd-japandi-interior_16216036.htm#query=interior%20mockup&position=1&from_view=search&track=ais">
+          Image by rawpixel.com
+        </a>{' '}
+        on Freepik
+      </p>
     </div>
   );
 }
