@@ -2,7 +2,32 @@ import { fabric } from 'fabric';
 import { FabricJSCanvas, useFabricJSEditor } from 'fabricjs-react';
 import { imagedataToSVG } from 'imagetracerjs';
 import { useEffect, useState } from 'react';
+import * as Icons from '@mui/icons-material';
 import FontFaceObserver from 'fontfaceobserver';
+
+const fonts = [
+  'Poppins',
+  'Pacifico',
+  'Satisfy',
+  'Great Vibes',
+  'Sacreamento',
+  'Sriracha',
+  'Bebas Neue',
+  'Lobster',
+  'Kablammo',
+];
+
+const woods = [
+  'https://th.bing.com/th/id/OIP.9pwzuXW2uqXDRGlprS7wYAHaE8?w=274&h=183&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.tg-Tp4w2x0A8Q2FDK2FP9gHaE8?w=258&h=180&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.fiDIlxFK5jc1r0R_xhp5rAHaFj?w=259&h=194&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.jN1XzePClQk2dSh5uWQCIgHaFj?w=259&h=194&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.HGidIMtJr5Kbrmb9viB39AHaEK?w=333&h=187&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.2iQmLO2uFRGalOeIQffouQHaHa?w=204&h=204&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.hZJpWGUCydcNtdII1AZbLQHaFh?w=242&h=180&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.KiGPGo06xxYRz7Bd-4tPSQHaHa?w=180&h=180&c=7&r=0&o=5&pid=1.7',
+  'https://th.bing.com/th/id/OIP.bWZoBou5Mvfp5aIaqVqVOQHaFi?w=248&h=186&c=7&r=0&o=5&pid=1.7',
+];
 
 const addSVGStringToCanvas = (svgString, canvas) => {
   fabric.loadSVGFromString(svgString, (objects, options) => {
@@ -34,16 +59,18 @@ function convertURIToImageData(URI) {
   });
 }
 
-function applyPattern(url, shape, patternArea, canvas) {
+function applyPattern(url, shape, patternArea = 'stroke', canvas) {
   fabric.Image.fromURL(
     url,
     function (img) {
       const pattern = new fabric.Pattern({
         source: img._element,
         repeat: 'repeat',
+        scaleWithObject: false,
       });
       pattern.scaleX = 10;
       pattern.scaleY = 10;
+
       shape.set(patternArea, pattern);
       canvas.renderAll();
     },
@@ -68,75 +95,127 @@ const loadAndUse = (font, canvas) => {
     });
 };
 
-const Canvas = ({ template, wood, size, color, firstName, lastName }) => {
+const Canvas = () => {
   const { editor, onReady } = useFabricJSEditor();
   const [padding, setPadding] = useState(50);
+  const [color, setColor] = useState();
 
-  //Load template
   useEffect(() => {
-    editor?.canvas.clear();
-    fabric.loadSVGFromURL(process.env.PUBLIC_URL + '/templates/svg (8).svg', (objects, options) => {
-      objects.forEach((object) => {
-        if (object.isType('text')) {
-          if (object.get('text') === 'first') object.set('id', 'first');
-          if (object.get('text') === 'last') object.set('id', 'last');
-          object.set('initialWidth', object.getScaledWidth());
-        } else object.set('selectable', false);
+    console.log('ready');
+  }, [onReady]);
 
-        editor?.canvas.add(object);
+  const deleteObject = () => {
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      editor?.canvas.remove(object);
+    });
+  };
+
+  const duplicateObject = () => {
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      object.clone((clone) => {
+        console.log(object.left);
+        const transform = object.calcTransformMatrix();
+        editor?.canvas.add(clone);
       });
     });
-  }, [template, editor?.canvas]);
+  };
 
-  editor?.canvas.setHeight('400');
-  editor?.canvas.setWidth('400');
+  editor?.canvas.setHeight('800');
+  editor?.canvas.setWidth('800');
+
+  const addText = () => {
+    const newText = new fabric.IText('Test Text', {
+      strokeLineCap: 'round',
+      strokeLineJoin: 'round',
+      paintFirst: 'stroke',
+      strokeWidth: padding,
+      fill: 'white',
+      strokeUniform: true,
+      strokeMiterLimit: 100,
+      fillRule: 'even',
+    });
+    newText.on('modified', function () {
+      newText.set({
+        width: newText.width * newText.scaleX,
+        scaleX: 1,
+        height: newText.height * newText.scaleY,
+        scaleY: 1,
+        fontSize: newText.fontSize * newText.scaleY,
+        strokeWidth: newText.strokeWidth * newText.scaleY,
+      }); // apply the scale
+      newText.setCoords(); // called so that the bounding box etc gets updated
+    });
+    applyPattern(
+      'https://th.bing.com/th?id=OIP.U50enectlTS59a1Ky8rkdQHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2',
+      newText,
+      'stroke',
+      editor?.canvas
+    );
+    editor?.canvas.add(newText);
+  };
+
+  const addCircle = () => {
+    const circle = new fabric.Circle({ radius: 50 });
+
+    editor?.canvas.add(circle);
+    circle.on('modified', function () {
+      circle.set({
+        radius: circle.radius * circle.scaleX,
+        scaleX: 1,
+        scaleY: 1,
+      }); // apply the scale
+      circle.setCoords(); // called so that the bounding box etc gets updated
+    });
+
+    applyPattern(
+      'https://th.bing.com/th?id=OIP.U50enectlTS59a1Ky8rkdQHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2',
+      circle,
+      'fill',
+      editor?.canvas
+    );
+  };
+
+  const addRect = () => {
+    const rect = new fabric.Rect({ width: 150, height: 80 });
+
+    editor?.canvas.add(rect);
+    rect.on('modified', function () {
+      rect.set({
+        width: rect.width * rect.scaleX,
+        scaleX: 1,
+        height: rect.height * rect.scaleY,
+        scaleY: 1,
+      }); // apply the scale
+      rect.setCoords(); // called so that the bounding box etc gets updated
+    });
+
+    applyPattern(
+      'https://th.bing.com/th?id=OIP.U50enectlTS59a1Ky8rkdQHaHa&w=250&h=250&c=8&rs=1&qlt=90&o=6&pid=3.1&rm=2',
+      rect,
+      'fill',
+      editor?.canvas
+    );
+  };
+
+  const moveForward = () =>
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      object.bringForward(true);
+    });
+
+  const moveBackward = () =>
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      object.sendBackwards(true);
+    });
 
   const setFont = (font) => {
     loadAndUse(font, editor?.canvas);
   };
 
-  //Watch for wood change
-  useEffect(() => {
-    editor?.canvas._objects.forEach((object) => {
-      if (object.isType('text')) return;
-      applyPattern(wood.url, object, 'fill', editor?.canvas);
+  const changeWood = (wood) => {
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      applyPattern(wood, object, object.isType('i-text') ? 'stroke' : 'fill', editor?.canvas);
     });
-  }, [wood, editor?.canvas]);
-
-  //Watch for Color change
-  useEffect(() => {
-    editor?.canvas._objects.forEach((object) => {
-      if (!object.isType('text')) return;
-      if (color.url == undefined) object.set('fill', color.value);
-      else applyPattern(color.url, object, 'fill', editor?.canvas);
-    });
-  }, [color, editor?.canvas]);
-
-  //Watch for firstName change
-  useEffect(() => {
-    editor?.canvas._objects.forEach((object) => {
-      if (object.id !== 'first') return;
-      object.set('text', firstName);
-      object.scaleToWidth(object.get('initialWidth'));
-    });
-  }, [firstName, editor?.canvas]);
-
-  //Watch for lastName change
-  useEffect(() => {
-    editor?.canvas._objects.forEach((object) => {
-      if (object.id !== 'last') return;
-      object.set('text', lastName);
-      object.scaleToWidth(object.get('initialWidth'));
-    });
-  }, [lastName, editor?.canvas]);
-
-  //Watch for size change
-  useEffect(() => {
-    editor?.canvas.set('centeredScaling', true);
-    const intSize = parseInt(size.split('x')[0]);
-    const scaleRatio = intSize / 48;
-    editor?.canvas.zoomToPoint({ x: 200, y: 200 }, scaleRatio);
-  }, [size, editor?.canvas]);
+  };
 
   const rasterize = () => {
     let cutout = undefined;
@@ -168,7 +247,123 @@ const Canvas = ({ template, wood, size, color, firstName, lastName }) => {
     });
   };
 
-  return <FabricJSCanvas className="editor" onReady={onReady} />;
+  useEffect(() => {
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      if (!object.isType('i-text')) return;
+      object.set({ strokeWidth: padding });
+
+      editor?.canvas.renderAll();
+    });
+  }, [padding]);
+
+  useEffect(() => {
+    editor?.canvas.getActiveObjects().forEach((object) => {
+      if (!object.isType('i-text')) return;
+      object.set({ fill: color });
+
+      editor?.canvas.renderAll();
+    });
+  }, [color]);
+
+  return (
+    <div className="editor">
+      <div id="toolBar">
+        <p className="description"> Add objects </p>
+        <div className="section">
+          <button className="toolButton" onClick={addText}>
+            <Icons.TextFieldsRounded />
+            Text
+          </button>
+          <button className="toolButton" onClick={addCircle}>
+            <Icons.CircleOutlined />
+            Circle
+          </button>
+          <button className="toolButton" onClick={addRect}>
+            <Icons.SquareOutlined />
+            Square
+          </button>
+        </div>
+
+        <p className="description"> Layers </p>
+        <div className="section">
+          <button className="toolButton" onClick={moveForward}>
+            <Icons.FlipToFrontRounded />
+            Forward
+          </button>
+          <button className="toolButton" onClick={moveBackward}>
+            <Icons.FlipToBackRounded />
+            Backward
+          </button>
+        </div>
+
+        <p className="description"> Modify Active Objects </p>
+        <div className="section">
+          <button className="toolButton" onClick={deleteObject}>
+            <Icons.DeleteForeverRounded />
+            Delete
+          </button>
+          <button className="toolButton" onClick={duplicateObject}>
+            <Icons.ContentCopyRounded />
+            Duplicate
+          </button>
+        </div>
+
+        <p className="description"> Style </p>
+        <div className="section">
+          <label className="slider">
+            <Icons.BorderColorRounded htmlColor="white" />
+            <input
+              type="range"
+              name="padding"
+              min={0}
+              max={100}
+              onChange={(e) => setPadding(parseFloat(e.target.value))}
+            />
+          </label>
+          <label className="slider">
+            <Icons.FormatColorFillRounded htmlColor="white" />
+            <input type="color" name="padding" onChange={(e) => setColor(e.target.value)} />
+          </label>
+        </div>
+
+        <p className="description"> Font </p>
+        <div className="section">
+          {fonts.map((font) => {
+            return (
+              <button
+                className="toolButton"
+                style={{ fontFamily: font }}
+                onClick={() => setFont(font)}
+              >
+                {font}
+              </button>
+            );
+          })}
+        </div>
+
+        <p className="description"> Wood </p>
+        <div className="section">
+          {woods.map((wood) => {
+            return (
+              <button
+                className="toolButton"
+                style={{ background: `url(${wood})` }}
+                onClick={() => changeWood(wood)}
+              ></button>
+            );
+          })}
+        </div>
+        <p className="description"> Export features </p>
+        <div className="section">
+          <button className="toolButton" id="rasterrize" onClick={rasterize}>
+            Get Tool Path
+          </button>
+        </div>
+      </div>
+
+      <FabricJSCanvas className="canvas" onReady={onReady} />
+    </div>
+  );
 };
 
 export default Canvas;
