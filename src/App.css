@@ -1,105 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Great+Vibes&family=Kablammo&family=Lobster&family=Pacifico&family=Poppins&family=Sacramento&family=Satisfy&family=Sriracha&display=swap');
 
-.App {
-  text-align: center;
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-}
-p,
-a {
-  color: white;
-}
-.canvas {
-  border: solid white 1px;
-  border-radius: 10px;
-  background-image: url(https://img.freepik.com/free-psd/living-room-wall-psd-japandi-interior_53876-109285.jpg?w=826&t=st=1688104525~exp=1688105125~hmac=1e9fe02d56b1f9bf3f086bb37ee21651c9a2ad432ffa0ed66d428b34cc1362f2);
-  margin: 10px;
-}
-
-.editor {
-  display: flex;
-}
 .lower-canvas {
   filter: drop-shadow(rgba(255, 255, 255, 1) -1px -1px 0px)
     drop-shadow(rgba(0, 0, 0, 0.303) 3px 3px 2px) drop-shadow(rgba(0, 0, 0, 0.319) 2px 2px 10px);
 }
-button {
-  transition: transform 0.1s ease;
-}
-button:hover {
-  transform: scale(1.07);
-}
-button:active {
-  transform: scale(0.99);
-}
 
-.toolButton {
+.App {
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  justify-content: space-evenly;
-  width: 5em;
-  height: 4em;
-  border: none;
-  border-radius: 0.5em;
-  padding: 0.5em;
-}
-.slider {
-  flex-grow: 1;
-  width: 100%;
-  text-align: left;
+  height: 100vh;
 }
 
-.toolButton > * {
-  flex: 1;
-  width: 100%;
-}
-
-#toolBar {
-  display: flex;
-  flex-direction: column;
-  max-width: 30ch;
-}
-
-.section {
-  flex-wrap: wrap;
-  display: flex;
-  gap: 0.3em;
-}
-
-#toolBar .description {
-  text-align: left;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.editor {
+  margin: auto;
+  text-align: right;
+  width: fit-content;
 }
